@@ -63,11 +63,11 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
   Serial.println(times[a]);
   Serial.println(flag_efectos);
   Serial.println(flag_tiempos);
-  if(millis()-rebote>100&&flag_efectos){
+  if(millis()-rebote>100&&flag_efectos){ //debouncing de pulsador efectosSW
     flag_efectos=0;
     attachInterrupt(digitalPinToInterrupt(efectosSW),efectos,FALLING); //Habilita nuevamente int. generada por el GPIO14
   }
-  if(millis()-rebote>100&&flag_tiempos){
+  if(millis()-rebote>100&&flag_tiempos){ //debouncing de pulsador tiemposSW
     flag_tiempos=0;
     attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING); //Habilita nuevamente int. generada por el GPIO14
   }
@@ -257,12 +257,12 @@ void caraxcara(int t) {
 
 //Esta funcion recorre desde el centro hasta la punta
 void culebrita(int t){
-  int pins[]={9,10,6,5,4,8,12,13,14,15,11,7,3,2,1,0};
-  int culb[]={0,8,7,6};
-  for (int j = 0 ; j < 4 ; j++){
+  int pins[]={9,10,6,5,4,8,12,13,14,15,11,7,3,2,1,0}; //leds que se van a encender
+  int culb[]={0,8,7,6}; //niveles que se van a encender
+  for (int j = 0 ; j < 4 ; j++){ //for para recorrer los niveles a encender
     if(flag_efectos){break;}
     y=culb[j]; level();
-    for (int i = 0; i < 16 ; i++){
+    for (int i = 0; i < 16 ; i++){ //for para recorrer los leds que se van a encender
       if(flag_efectos){break;}
       LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
       digitalWrite(led[pins[i]],0);
