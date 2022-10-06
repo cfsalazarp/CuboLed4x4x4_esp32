@@ -93,7 +93,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         culebrita(t); break;
     case 7: 
     Serial.println("Entra a case 7");
-        cuadrado(); break;
+        cuadrado(t); break;
     case 8: 
     Serial.println("Entra a case 8");
         randLed(); break;
@@ -111,7 +111,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cubito(t);
         caraxcara(t);
         culebrita(t);
-        cuadrado();
+        cuadrado(t);
         randLed();
         cargaCubo();
         vertices();
@@ -251,7 +251,6 @@ void caraxcara(int t) {
   LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
   LED (1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
   LED (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
-
   //w++;
 }
 
@@ -274,36 +273,44 @@ void culebrita(int t){
   //w++;
 }
 
-void cuadrado(){
+void cuadrado(int t){
   int culb[]={0,8,7,6};
-  int t = 500;
+  int pins[]={0,1,2,3,7,11,15,14,13,12,8,4}; //leds que se van a encender
   y = 0; level();
-  LED (0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0); delay(t);
-  LED (0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
-  LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
+  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); //inicializa los leds
+  for(int j = 0; j < 12; j++){
+    if(flag_efectos){break;}
+    digitalWrite(led[pins[j]],0);
+    delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
+  for(int i = 0; i < 2; i++){
+    if(flag_efectos){break;}
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+      LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
   for (int j = 0; j < 4; j++) { //Este for se utiliza para pasar de una fila a otra
+    if(flag_efectos){break;}
     y = culb[j]; level();
-    LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(5*t);
+    LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
   }
   y=6; level();
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
+  for(int i = 0; i < 2; i++){
+    if(flag_efectos){break;}
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+      LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(t);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
 
   //w++;
 }
