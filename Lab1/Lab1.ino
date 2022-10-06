@@ -49,8 +49,8 @@ void setup() { //En esta parte se establece la configuración
  attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING); //Habilita int. generada por el GPIO14
  flag_efectos=0;
  flag_tiempos=0;
- w = 6;
- a = 3;
+ w = 1;
+ a = 0;
  t = times[0];
 }
 
@@ -75,25 +75,25 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
   switch(w){
     case 1:
     Serial.println("Entra a case 1");
-        extCol(t);break;
+        extCol(t);break; //exitoso
     case 2: 
     Serial.println("Entra a case 2");
-        uxu(t);break;
+        uxu(t);break; //exitoso
     case 3: 
     Serial.println("Entra a case 3");
-        pxp(t);break;
+        pxp(t);break; //exitoso
     case 4: 
     Serial.println("Entra a case 4");
-        cubito(t); break;
+        cubito(t); break; //exitoso
     case 5: 
     Serial.println("Entra a case 5");
-        caraxcara(t); break;
+        caraxcara(t); break; 
     case 6: 
     Serial.println("Entra a case 6");
-        culebrita(t); break;
+        culebrita(t); break; //exitoso
     case 7: 
     Serial.println("Entra a case 7");
-        cuadrado(t); break;
+        cuadrado(t); break; //exitoso
     case 8: 
     Serial.println("Entra a case 8");
         randLed(); break;
