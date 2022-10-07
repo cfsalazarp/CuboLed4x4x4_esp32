@@ -111,7 +111,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cargaCubo(); break;
     case 10: 
     Serial.println("Entra a case 10");
-        PWMled(); break;
+        diagonal(t); break;
     case 11: 
     Serial.println("Entra a case 11");
         extCol(t);
@@ -123,7 +123,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cuadrado(t);
         randLed(t);
         cargaCubo();
-        PWMled();
+        diagonal(t);
         break; 
   }
 }
@@ -366,28 +366,27 @@ void cuadrado(int t){
 }
 
 //Este efecto usa pwm para encender y apagar los leds con efecto fade
-void PWMled(){
-  Serial.println("vertices");
-  y=6; level();
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  for(int duty = 0; duty <= 255; duty++){
-    Serial.println(duty);
-    for(int x = 0; x < 16; x++){
-      Serial.println(x);
-     ledcWrite(channel[x], duty); 
-    }
-    delay(20);
-  }
-  for(int duty = 255; duty >= 0; duty--){
-    Serial.println(duty);
-    for(int x = 0; x < 16; x++){
-      Serial.println(x);
-     ledcWrite(channel[x], duty); 
-    }
-    delay(20);
-  }
-  
-}
+//void PWMled(){
+//  Serial.println("vertices");
+//  y=6; level();
+//  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+//  for(int duty = 0; duty <= 255; duty++){
+//    Serial.println(duty);
+//    for(int x = 0; x < 16; x++){
+//      Serial.println(x);
+//     ledcWrite(channel[x], duty); 
+//    }
+//    delay(20);
+//  }
+//  for(int duty = 255; duty >= 0; duty--){
+//    Serial.println(duty);
+//    for(int x = 0; x < 16; x++){
+//      Serial.println(x);
+//     ledcWrite(channel[x], duty); 
+//    }
+//    delay(20);
+//  }
+//}
 
 //Efecto de leds Random
 void randLed(int t){
