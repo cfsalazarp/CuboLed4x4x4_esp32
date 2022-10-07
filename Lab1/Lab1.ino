@@ -87,7 +87,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cubito(t); break; //exitoso
     case 5: 
     Serial.println("Entra a case 5");
-        caraxcara(t); break; 
+        caraxcara(t); break; //exitoso
     case 6: 
     Serial.println("Entra a case 6");
         culebrita(t); break; //exitoso
@@ -96,7 +96,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cuadrado(t); break; //exitoso
     case 8: 
     Serial.println("Entra a case 8");
-        randLed(); break;
+        randLed(t); break; //exitoso
     case 9: 
     Serial.println("Entra a case 9");
         cargaCubo(); break;
@@ -112,7 +112,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         caraxcara(t);
         culebrita(t);
         cuadrado(t);
-        randLed();
+        randLed(t);
         cargaCubo();
         vertices();
         break; 
@@ -242,15 +242,48 @@ void cubito(int t) {
 //En esta animación prende una cara del cubo
 void caraxcara(int t) {
   Serial.println("caraxcara");
-  //int t = 250; //Esta variable determina el tiempo que espera el Arduino para realizar la siguiente acción
   y = 6; level();
-  LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(t);
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
-  LED (1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
-  LED (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
+  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  for(int i = 0; i < 16; i = i + 4){ //activa las columnas de inicio a fin
+    if(flag_efectos){break;}
+    digitalWrite(led[i],0);
+    digitalWrite(led[i+1],0);
+    digitalWrite(led[i+2],0);
+    digitalWrite(led[i+3],0);
+    delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
+    for(int i = 0; i < 16; i = i + 4){ //desactiva las columnas de inicio a fin
+    if(flag_efectos){break;}
+    digitalWrite(led[i],1);
+    digitalWrite(led[i+1],1);
+    digitalWrite(led[i+2],1);
+    digitalWrite(led[i+3],1);
+    delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
+    for(int i = 15; i >= 0; i = i - 4){ //activa las columnas de fin a inicio
+    if(flag_efectos){break;}
+    digitalWrite(led[i],0);
+    digitalWrite(led[i-1],0);
+    digitalWrite(led[i-2],0);
+    digitalWrite(led[i-3],0);
+    delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
+    for(int i = 15; i >= 0; i = i - 4){ //desactiva las columnas de fin a inicio
+    if(flag_efectos){break;}
+    digitalWrite(led[i],1);
+    digitalWrite(led[i-1],1);
+    digitalWrite(led[i-2],1);
+    digitalWrite(led[i-3],1);
+    delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+  }
   //w++;
 }
 
@@ -317,36 +350,20 @@ void cuadrado(int t){
 
 //Este efecto rodea los vertices de las caras del cubo
 void vertices(){
- int t = 500; //Esta variable determina el tiempo que espera el Arduino para realizar la siguiente acción
- int a = 500; //Esta variable determina las veces que se repetirá una secuencia para formar una imagen que no vibre
- for (int x = 0; x < a; x++) { //este for se utiliza para crear una imagen que no vibre
- y = 4; level();
- LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(5);
- y = 5; level();
- LED (0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0); delay(5);
- }
- y = 5; level();
- LED (1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1); delay(t);
- for (int x = 0; x < a; x++) {
- y = 4; level();
- LED (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(5);
- y = 5; level();
- LED (0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0); delay(5);
- }
- y = 5; level();
- LED (1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1); delay(t);
- //w++;
+  
 }
 
 //Efecto de leds Random
-void randLed(){
-  int t = 250;
+void randLed(int t){
   for (int j = 0; j < 50; j++){
+    if(flag_efectos){break;}
      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
      y = 10; level();
      digitalWrite(led[random(0,16)],0);
      digitalWrite(lvl[random(0,4)],1);
      delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
   }
   //w++;
 }
