@@ -8,6 +8,11 @@ int a = 0; //Variable para cambiar de tiempos
 int y; //Variable para encender las filas
 int t;
 
+const int freq = 5000;
+const int channel[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//const int channel = 0;
+const int res = 8;
+
 volatile uint8_t flag_efectos;
 volatile uint8_t flag_tiempos;
 volatile uint32_t rebote;
@@ -38,18 +43,22 @@ void setup() { //En esta parte se establece la configuración
  Serial.begin(115200);
  for (int x = 0; x < 16; x ++) { //Declarar los pines de las columnas como salidas
  pinMode(led[x], OUTPUT);
+ ledcSetup(channel[x], freq, res);
+ ledcAttachPin(led[x], channel[x]);
  }
  for (int x = 0; x < 4; x ++) { //Declarar los pines de las filas como salidas
  pinMode(lvl[x], OUTPUT);
  }
+
  randomSeed(1);
  pinMode(efectosSW, INPUT);
  pinMode(tiemposSW, INPUT);
+ 
  attachInterrupt(digitalPinToInterrupt(efectosSW),efectos,FALLING); //Habilita int. generada por el GPIO14
  attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING); //Habilita int. generada por el GPIO14
  flag_efectos=0;
  flag_tiempos=0;
- w = 1;
+ w = 10;
  a = 0;
  t = times[0];
 }
@@ -102,7 +111,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cargaCubo(); break;
     case 10: 
     Serial.println("Entra a case 10");
-        vertices(); break;
+        PWMled(); break;
     case 11: 
     Serial.println("Entra a case 11");
         extCol(t);
@@ -114,7 +123,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         cuadrado(t);
         randLed(t);
         cargaCubo();
-        vertices();
+        PWMled();
         break; 
   }
 }
@@ -356,8 +365,27 @@ void cuadrado(int t){
   //w++;
 }
 
-//Este efecto rodea los vertices de las caras del cubo
-void vertices(){
+//Este efecto usa pwm para encender y apagar los leds con efecto fade
+void PWMled(){
+  Serial.println("vertices");
+  y=6; level();
+  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+  for(int duty = 0; duty <= 255; duty++){
+    Serial.println(duty);
+    for(int x = 0; x < 16; x++){
+      Serial.println(x);
+     ledcWrite(channel[x], duty); 
+    }
+    delay(20);
+  }
+  for(int duty = 255; duty >= 0; duty--){
+    Serial.println(duty);
+    for(int x = 0; x < 16; x++){
+      Serial.println(x);
+     ledcWrite(channel[x], duty); 
+    }
+    delay(20);
+  }
   
 }
 
