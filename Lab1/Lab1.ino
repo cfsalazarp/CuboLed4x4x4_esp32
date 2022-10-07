@@ -1,5 +1,5 @@
-#define efectosSW 35
-#define tiemposSW 36
+#define efectosSW 34
+#define tiemposSW 39
 int led[] = {15,2,4,16,17,5,18,19,32,33,25,26,27,14,12,13}; //Salidas de las columnas
 int lvl[] = {21,3,23,22}; //Salidas de las filas
 int times[] = {50, 150, 350, 750, 1250}; //tiempos establecidos
@@ -8,34 +8,31 @@ int a = 0; //Variable para cambiar de tiempos
 int y; //Variable para encender las filas
 int t;
 
-const int freq = 5000;
-const int channel[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
-//const int channel = 0;
-const int res = 8;
+//const int freq = 5000;
+//const int channel[] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+//const int res = 8;
 
 volatile uint8_t flag_efectos;
 volatile uint8_t flag_tiempos;
-volatile uint32_t rebote;
+volatile uint32_t rebote1;
+volatile uint32_t rebote2;
 
 void IRAM_ATTR efectos(){
   Serial.println("Entro a isr efectos");
   w++;
-  if( w > 11){ w = 1; }
   flag_efectos=1; //Activa bandera para indicar ingreso a rutina de interrupción
-  rebote=millis(); //Leer valor actual de la funcion millis()
-  detachInterrupt(digitalPinToInterrupt(efectosSW)); //Deshabilita int. del GPIO14
+  rebote1=millis(); //Leer valor actual de la funcion millis()
+  detachInterrupt(digitalPinToInterrupt(efectosSW));
 }
 
 void IRAM_ATTR tiempos(){
   Serial.println("Entro a isr tiempos");
   a++;
-  if( a > 4){ a = 0;}
   flag_tiempos=1; //Activa bandera para indicar ingreso a rutina de interrupción
-  t = times[a];
   Serial.print("timesIntr:");
   Serial.println(t);
-  rebote=millis(); //Leer valor actual de la funcion millis()
-  detachInterrupt(digitalPinToInterrupt(tiemposSW)); //Deshabilita int. del GPIO14
+  rebote2=millis(); //Leer valor actual de la funcion millis()
+  detachInterrupt(digitalPinToInterrupt(tiemposSW));
 }
 
 
@@ -43,43 +40,40 @@ void setup() { //En esta parte se establece la configuración
  Serial.begin(115200);
  for (int x = 0; x < 16; x ++) { //Declarar los pines de las columnas como salidas
  pinMode(led[x], OUTPUT);
- ledcSetup(channel[x], freq, res);
- ledcAttachPin(led[x], channel[x]);
+ //ledcSetup(channel[x], freq, res);
+ //ledcAttachPin(led[x], channel[x]);
  }
  for (int x = 0; x < 4; x ++) { //Declarar los pines de las filas como salidas
  pinMode(lvl[x], OUTPUT);
  }
-
  randomSeed(1);
- pinMode(efectosSW, INPUT);
- pinMode(tiemposSW, INPUT);
- 
+ pinMode(efectosSW, INPUT_PULLUP);
+ pinMode(tiemposSW, INPUT_PULLUP);
  attachInterrupt(digitalPinToInterrupt(efectosSW),efectos,FALLING); //Habilita int. generada por el GPIO14
  attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING); //Habilita int. generada por el GPIO14
  flag_efectos=0;
  flag_tiempos=0;
- w = 10;
+ w = 1;
  a = 0;
  t = times[0];
 }
 
 void loop() { //En esta parte se repite la secuencia infinitas veces
-  Serial.print("w:");
-  Serial.println(w);
-  Serial.print("a:");
-  Serial.println(a);
-  Serial.print("times:");
-  Serial.println(times[a]);
+  Serial.print("w:"); Serial.println(w);
+  Serial.print("a:"); Serial.println(a);
+  Serial.print("times:"); Serial.println(times[a]);
   Serial.println(flag_efectos);
   Serial.println(flag_tiempos);
-  if(millis()-rebote>100&&flag_efectos){ //debouncing de pulsador efectosSW
+  if(millis()-rebote1>300&&flag_efectos){ //debouncing de pulsador efectosSW
     flag_efectos=0;
     attachInterrupt(digitalPinToInterrupt(efectosSW),efectos,FALLING); //Habilita nuevamente int. generada por el GPIO14
   }
-  if(millis()-rebote>100&&flag_tiempos){ //debouncing de pulsador tiemposSW
+  if(millis()-rebote2>300&&flag_tiempos){ //debouncing de pulsador tiemposSW
     flag_tiempos=0;
     attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING); //Habilita nuevamente int. generada por el GPIO14
   }
+  if( w > 11){ w = 1; }
+  if( a > 4){ a = 0;}
   t = times[a];
   switch(w){
     case 1:
@@ -108,7 +102,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         randLed(t); break; //exitoso
     case 9: 
     Serial.println("Entra a case 9");
-        cargaCubo(); break;
+        cargaCubo(t); break;
     case 10: 
     Serial.println("Entra a case 10");
         diagonal(t); break;
@@ -122,7 +116,7 @@ void loop() { //En esta parte se repite la secuencia infinitas veces
         culebrita(t);
         cuadrado(t);
         randLed(t);
-        cargaCubo();
+        cargaCubo(t);
         diagonal(t);
         break; 
   }
@@ -168,6 +162,7 @@ void level() { //En esta función se establecen los valores para las filas donde
  case 8: LVL (1, 1, 0, 0); break; //Las primeras dos
  case 9: LVL (0, 0, 1, 1); break; //Las últimas dos
  case 10: LVL (0, 0, 0, 0); break; //Ninguna encendida
+ case 11: LVL (0, 1, 1, 1); break; //Todas excepto la primera
  }
 }
 
@@ -182,9 +177,7 @@ void extCol(int t){
     LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); //apaga todos los leds
     digitalWrite(led[pins[i]],0); //enciende el led que se necesita
     delay(t); //delay para ver efecto
-    Serial.print("times:"); //mensaje que muestra el t que se esta manejando
-    Serial.println(t);
-    if(flag_tiempos){t = times[a];flag_tiempos=0; //bandera que cambia el tiempo que se esta usando cuando se oprime el boton
+    if(flag_tiempos){t = times[a];flag_tiempos=0; delay(10); //bandera que cambia el tiempo que se esta usando cuando se oprime el boton
     attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);} //activa nuevamente la interrupcion
   }
   //w++;
@@ -199,7 +192,7 @@ void uxu(int t) {
       LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
       digitalWrite(led[i],0);
       delay(t);
-      if(flag_tiempos){t = times[a];flag_tiempos=0;
+      if(flag_tiempos){t = times[a];flag_tiempos=0; delay(10);
     attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
       if(flag_efectos){break;}
     }
@@ -221,7 +214,6 @@ void pxp(int t) {
   }
   for (int k = 3; k >= 0; k--) { //Este for se utiliza para pasar de una fila a otra
     if(flag_efectos){break;}
-    Serial.println("Desde el ultimo piso");
     y = k; level();
     LED (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(t);
     if(flag_tiempos){t = times[a];flag_tiempos=0;
@@ -404,14 +396,15 @@ void randLed(int t){
 }
 
 //Funcion para efecto de carga de cubo
-void cargaCubo(){
-  int t = 2500;
+void cargaCubo(int t){
   LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
   y = 10; level();
   Serial.println("Cubo reinicializado");
   for (int i = 3; i >= 0; i--){
+    if(flag_efectos){break;}
     Serial.println(i);
     for(int j = 15; j >= 0; j--){
+      if(flag_efectos){break;}
       Serial.println(j);
       digitalWrite(led[j],0);
       digitalWrite(lvl[i],1);
@@ -419,4 +412,138 @@ void cargaCubo(){
     }
   }
   //w=1;
+}
+
+//Este efecto ilumina diagonalmente el cubo
+void diagonal(int t){
+    LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    int ini=millis();
+    for(int i=0;i<(t/5);i++){
+      if(flag_efectos){break;}
+      y=0;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(5);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/4);i++){
+      if(flag_efectos){break;}
+      y=8;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=0;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/6);i++){
+      if(flag_efectos){break;}
+      y=7;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=8;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=0;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/8);i++){
+      if(flag_efectos){break;}
+      y=6;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=7;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=8;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      y=0;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/6);i++){
+      if(flag_efectos){break;}
+      y=6;level();
+      LED (0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=7;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      y=8;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/4);i++){
+      if(flag_efectos){break;}
+      y=6;level();
+      LED (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      y=7;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/4);i++){
+      if(flag_efectos){break;}
+      y=6;level();
+      LED (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/4);i++){
+      if(flag_efectos){break;}
+      y=11;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=6;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/6);i++){
+      if(flag_efectos){break;}
+      y=9;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=11;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=6;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/8);i++){
+      if(flag_efectos){break;}
+      y=3;level();
+      LED (0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=9;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=11;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      y=6;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/6);i++){
+      if(flag_efectos){break;}
+      y=3;level();
+      LED (1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1); delay(2);
+      y=9;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      y=11;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/4);i++){
+      if(flag_efectos){break;}
+      y=3;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1); delay(2);
+      y=9;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for(int i=0;i<(t/4);i++){
+      if(flag_efectos){break;}
+      y=3;level();
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0); delay(2);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
 }
