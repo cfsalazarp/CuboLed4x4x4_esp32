@@ -294,7 +294,15 @@ void culebrita(int t){
   for (int j = 0 ; j < 4 ; j++){ //for para recorrer los niveles a encender
     if(flag_efectos){break;}
     y=culb[j]; level();
-    for (int i = 0; i < 16 ; i++){ //for para recorrer los leds que se van a encender
+    for (int i = 0; i < 16 ; i++){ //for para recorrer los leds que se van a encender de inicio a fin
+      if(flag_efectos){break;}
+      LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+      digitalWrite(led[pins[i]],0);
+      delay(t);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
+    }
+    for (int i = 15; i >= 0; i--){ //for para recorrer los leds que se van a encender de fin a inicio
       if(flag_efectos){break;}
       LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
       digitalWrite(led[pins[i]],0);
