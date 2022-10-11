@@ -1,3 +1,4 @@
+//Actaulizado 11/10/22
 #define efectosSW 34
 #define tiemposSW 39
 int led[] = {15,2,4,16,17,5,18,19,32,33,25,26,27,14,12,13}; //Salidas de las columnas
