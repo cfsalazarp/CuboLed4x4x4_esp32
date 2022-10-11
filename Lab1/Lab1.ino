@@ -397,18 +397,18 @@ void randLed(int t){
 
 //Funcion para efecto de carga de cubo
 void cargaCubo(int t){
-  LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-  y = 10; level();
-  Serial.println("Cubo reinicializado");
-  for (int i = 3; i >= 0; i--){
+  int lvls[]={3,2,1,0};
+  Serial.println("cargaCubo");
+  for (int i = 0; i < 4; i++){
     if(flag_efectos){break;}
-    Serial.println(i);
+    LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+    y = lvls[i]; level();
     for(int j = 15; j >= 0; j--){
       if(flag_efectos){break;}
-      Serial.println(j);
       digitalWrite(led[j],0);
-      digitalWrite(lvl[i],1);
       delay(t);
+    if(flag_tiempos){t = times[a];flag_tiempos=0;
+    attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
     }
   }
   //w=1;
@@ -416,6 +416,7 @@ void cargaCubo(int t){
 
 //Este efecto ilumina diagonalmente el cubo
 void diagonal(int t){
+  Serial.println("diagonal");
     LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
     int ini=millis();
     for(int i=0;i<(t/5);i++){
