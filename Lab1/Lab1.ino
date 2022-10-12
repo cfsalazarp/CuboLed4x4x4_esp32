@@ -178,7 +178,7 @@ void extCol(int t){
     LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); //apaga todos los leds
     digitalWrite(led[pins[i]],0); //enciende el led que se necesita
     delay(t); //delay para ver efecto
-    if(flag_tiempos){t = times[a];flag_tiempos=0; delay(10); //bandera que cambia el tiempo que se esta usando cuando se oprime el boton
+    if(flag_tiempos){t = times[a];flag_tiempos=0; //bandera que cambia el tiempo que se esta usando cuando se oprime el boton
     attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);} //activa nuevamente la interrupcion
   }
   //w++;
@@ -193,7 +193,7 @@ void uxu(int t) {
       LED (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
       digitalWrite(led[i],0);
       delay(t);
-      if(flag_tiempos){t = times[a];flag_tiempos=0; delay(10);
+      if(flag_tiempos){t = times[a];flag_tiempos=0;
     attachInterrupt(digitalPinToInterrupt(tiemposSW),tiempos,FALLING);}
       if(flag_efectos){break;}
     }
